@@ -20,11 +20,11 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+SECRET_KEY = os.getenv('SECRET_KEY')
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-!l^$o&q4faxjnepc$#d%*n$4bd)wqg7hkdx#(5abr82m1s8m6%'
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -77,34 +77,21 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'LMS.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/4.0/ref/settings/#databases
-
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": 'backend2',#os.getenv("DB_NAME"),
-        "USER": 'postgres',#os.getenv("DB_USER"),
-        "PASSWORD": 'lavanya',#os.getenv("DB_PASSWORD"),
-        "HOST": 'localhost',#os.getenv("DB_HOST", default="localhost"),
-        "PORT": '5432'#os.getenv("DB_PORT", default=5432),
+        "NAME": os.getenv("DB_NAME"),
+        "USER": os.getenv("DB_USER"),
+        "PASSWORD": os.getenv("DB_PASSWORD"),
+        "HOST": os.getenv("DB_HOST", default="localhost"),
+        "PORT": os.getenv("DB_PORT", default=5432),
     }
 }
+# Database
+# https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-# AWS settings
-AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
-AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
-AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME')
 
-# Additional AWS settings
-AWS_S3_SIGNATURE_NAME = 's3v4'
-AWS_S3_FILE_OVERWRITE = False
-AWS_DEFAULT_ACL = None
-AWS_S3_VERIFY = True
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-# Password validation
+
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
