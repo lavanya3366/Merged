@@ -107,6 +107,7 @@ class CourseRegisterRecord(models.Model):
     updated_at = models.DateTimeField(auto_now=True, auto_now_add=False, null=True)
     deleted_at = models.DateTimeField(null=True)
     
+    
     def __str__(self):
         return self.customer.name+" - "+self.course.title
     
@@ -124,6 +125,7 @@ class CourseEnrollment(models.Model):
     updated_at = models.DateTimeField(auto_now=True) # to ensure that if person's active status i changed after course update , then no signal is send to him about course change
     active = models.BooleanField(default= True)
     deleted_at = models.DateTimeField(null=True)
+    
     
     def __str__(self):
         return self.user.name+"-"+self.course.title
@@ -771,4 +773,3 @@ class QuizScore(models.Model):
     active = models.BooleanField(default=True)
     class Meta:
         db_table = 'quiz_score'
-

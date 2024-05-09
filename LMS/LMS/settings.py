@@ -90,6 +90,7 @@ DATABASES = {
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
+MAX_VIDEO_FILE_SIZE_MB = 16
 
 
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators

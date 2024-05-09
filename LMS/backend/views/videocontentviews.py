@@ -19,7 +19,7 @@ from backend.serializers.createcourseserializers import (
 from backend.serializers.courseserializers import (
     QuizSerializer,
 )
-from moviepy.editor import VideoFileClip # type: ignore
+from moviepy.editor import VideoFileClip
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -28,15 +28,15 @@ from backend.serializers.courseserializers import *
 
 import os
 import subprocess
-import boto3 # type: ignore
-from botocore.exceptions import ClientError # type: ignore
+import boto3
+from botocore.exceptions import ClientError
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage  
 from rest_framework import status
 from django.conf import settings
-import boto3 # type: ignore
-from botocore.exceptions import ClientError,ValidationError # type: ignore
+import boto3
+from botocore.exceptions import ClientError,ValidationError
 from backend.models.allmodels import *
 from backend.models.coremodels import *
 from backend.serializers.videocontentserializers import *
@@ -45,7 +45,7 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 class UploadVideoToS3APIView(APIView):
 
-    # permission_classes = [CourseContentPermissions]
+    permission_classes = [CourseContentPermissions]
     
     def post(self, request, course_id, *args, **kwargs):
         try:
@@ -172,15 +172,15 @@ class UploadVideoToS3APIView(APIView):
     
     def put(self, request, course_id, *args, **kwargs):
         try:
-            content_id = request.query_params.get('content_id')
+            video_material_id = request.data.get('video_material_id')
         
-            if content_id is None:
-                return Response({"error": "content_id is required in the query parameters."},
-                            status=status.HTTP_400_BAD_REQUEST)
+            if video_material_id is None:
+                return Response({"error": "video_material_id is required in the request body."},
+                                status=status.HTTP_400_BAD_REQUEST)
         
             with transaction.atomic():
             # Get the video material instance
-                video_material = get_object_or_404(UploadVideo, pk=content_id)
+                video_material = get_object_or_404(UploadVideo, pk=video_material_id)
             
             # Check if the associated course is active
                 if video_material.courses.filter(pk=course_id, active=True).exists():
@@ -236,29 +236,6 @@ class UploadVideoToS3APIView(APIView):
                 video_material.summary = summary
                 video_material.video_duration = video_duration
 
-            # Update course structure if needed
-                edit_type = request.query_params.get('edit_type')
-                if edit_type == 'status':
-                    if video_material.active:
-                        video_material.active = False
-                        CourseStructure.objects.filter(content_id=content_id, content_type='video', active=True, deleted_at__isnull=True).update(active=False)
-                    else:
-                        video_material.active = True
-                        try:
-                            last_order_number = CourseStructure.objects.filter(course=course_id).latest('order_number').order_number
-                        except CourseStructure.DoesNotExist:
-                            last_order_number = 0
-                        course_structure_data = {
-                            'course': course_id,
-                            'order_number': last_order_number + 1,
-                            'content_type': 'video',
-                            'content_id': video_material.pk
-                        }
-                        course_structure_serializer = CreateCourseStructureSerializer(data=course_structure_data)
-                        if course_structure_serializer.is_valid():
-                            course_structure_serializer.save()
-                        else:
-                            return Response({"error": course_structure_serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
             # Save the updated video material
                 video_material.save()
@@ -274,7 +251,8 @@ class UploadVideoToS3APIView(APIView):
             else:
                 status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
 
-            return Response({"error": error_message}, status=status_code)       
+            return Response({"error": error_message}, status=status_code)   
+         
     
     def patch(self, request, course_id, format=None):
         try:

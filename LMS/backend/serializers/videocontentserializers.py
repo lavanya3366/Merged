@@ -1,6 +1,12 @@
 from rest_framework import serializers
 from backend.models.allmodels import UploadVideo
 from django.core.validators import FileExtensionValidator
+from django.conf import settings
+from rest_framework import serializers
+from moviepy.editor import VideoFileClip  # Assuming you're using moviepy for video duration
+import tempfile
+import boto3
+from botocore.exceptions import ClientError
 
 class UploadVideoSerializer(serializers.ModelSerializer):
     class Meta:
@@ -32,6 +38,10 @@ class UploadVideoSerializer(serializers.ModelSerializer):
         # Validate video
         if not video:
             raise serializers.ValidationError("Video file is required.")
+        
+        max_size = settings.MAX_VIDEO_FILE_SIZE_MB * 1024 * 1024  # Convert MB to bytes
+        if video.size > max_size:
+            raise serializers.ValidationError(f"File size exceeds the maximum allowed size of {settings.MAX_VIDEO_FILE_SIZE_MB} MB.")
 
         return data
 

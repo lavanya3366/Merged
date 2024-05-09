@@ -57,10 +57,12 @@ class CourseCustomerRegistrationView(APIView):
     def get(self, request, *args, **kwargs):
         try:
             filtered_display = self.request.query_params.get('filtered_display')
+            search_customer = self.request.query_params.get('search_customer',None)
             if filtered_display not in filtered_display_list:
                 return Response({"error": "Invalid filtered_display parameter"}, status=status.HTTP_400_BAD_REQUEST)
-            
             queryset = CourseRegisterRecord.objects.filter(deleted_at__isnull=True).order_by('-created_at')
+            if search_customer:
+                queryset = queryset.filter(customer__name__icontains=search_customer)
             if filtered_display == "active":
                 queryset = queryset.filter(active=True)
             elif filtered_display == "inactive":
